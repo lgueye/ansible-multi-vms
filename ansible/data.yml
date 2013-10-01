@@ -1,0 +1,5 @@
+---
+- hosts: data
+  roles:
+     - common
+     - data

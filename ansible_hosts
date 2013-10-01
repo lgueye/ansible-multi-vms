@@ -1,0 +1,12 @@
+[data]
+limberdata
+
+[appserver]
+limberappserver0
+limberappserver1
+
+[search]
+limbersearch
+
+[proxy]
+limberproxy
