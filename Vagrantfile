@@ -15,14 +15,14 @@ Vagrant.configure('2') do |config|
   end
 
   roles = ['data', 'appserver', 'search', 'proxy']
-  count_app_servers = 2
+  app_servers_count = 2
   hosts = {}
   roles.each do |role|
     if role != 'appserver'
       hosts[role] = {'hosts' => [{'name' => "#{app_name}#{role}"}]}
     else
       hosts[role] = {'hosts' => []}
-      count_app_servers.times.map do |i|
+      app_servers_count.times.map do |i|
         hosts[role]['hosts'].push ({'name' => "#{app_name}#{role}#{i}"})
       end
     end
