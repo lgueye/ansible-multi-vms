@@ -1,6 +1,6 @@
 - name: Install curl
-  action: apt update_cache=yes pkg=curl state=present
+  action: apt pkg=curl state=present
 - name: Install ntpdate
-  action: apt update_cache=yes pkg=ntpdate state=present
+  action: apt pkg=ntpdate state=present
 - name: Install vim
-  action: apt update_cache=yes pkg=vim state=present
+  action: apt pkg=vim state=present

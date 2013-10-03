@@ -2,44 +2,47 @@ app_name = 'limber'
 
 Vagrant.configure('2') do |config|
 
-  config.vm.box = 'ubuntu-server-12.10'
-  config.vm.box_url = 'http://goo.gl/wxdwM'
-  config.vm.provision :hosts
+  config.vm.box = 'ubuntu-13.04'
 
-  config.vm.provider :digital_ocean do |provider, override|
-    override.ssh.private_key_path = '~/.ssh/louis.gueye@figarocms.fr_rsa'
-    provider.client_id = ENV.fetch('DO_CLIENT_ID') { abort 'add DO_CLIENT_ID' }
-    provider.api_key = ENV.fetch('DO_API_KEY') { abort 'add DO_API_KEY' }
-    provider.image = 'Ubuntu 13.04 x64'
-    provider.size = '1GB'
-    provider.region = 'Amsterdam 1'
-    provider.ansible.inventory_path = 'ansible_hosts'
+  config.hostmanager.enabled=true
+  config.hostmanager.manage_host= true
+  config.vm.provision :hostmanager
+
+  config.vm.provider :lxc do |lxc|
+    lxc.vm.box = 'ubuntu-13.04'
+    #lxc.vm.box_url = 'http://bit.ly/vagrant-lxc-raring64-2013-09-28-'
+    lxc.customize 'cgroup.memory.limit_in_bytes', '512M'
   end
 
-  roles = {
-      'data' => {'hosts' => [{'name' => 'limberdata'}]},
-      'appserver' => {'hosts' => [{'name' => 'limberappserver0'}, {'name' => 'limberappserver1'}]},
-      'search' => {'hosts' => [{'name' => 'limbersearch'}]},
-      'proxy' => {'hosts' => [{'name' => 'limberproxy'}]}
-  }
+  roles = ['data', 'appserver', 'search', 'proxy']
+  count_app_servers = 2
+  hosts = {}
+  roles.each do |role|
+    if role != 'appserver'
+      hosts[role] = {'hosts' => [{'name' => "#{app_name}#{role}"}]}
+    else
+      hosts[role] = {'hosts' => []}
+      count_app_servers.times.map do |i|
+        hosts[role]['hosts'].push ({'name' => "#{app_name}#{role}#{i}"})
+      end
+    end
+  end
 
-  roles.each_pair { |role, value|
-    value['hosts'].each { |host|
+  hosts.each_pair do |role, value|
+    value['hosts'].each do |host|
       hostname = host['name']
-
       config.vm.define hostname do |cfg|
         cfg.vm.hostname = hostname
-
-        cfg.vm.provider :digital_ocean do |docean|
-          docean.name = hostname
-        end
-
+        # shell provisioner
+        cfg.vm.provision "shell", inline: 'apt-get update ; apt-get upgrade -y; apt-get autoclean'
+        cfg.vm.provision "shell", inline: 'apt-get install -y python python-apt'
+        # ansible provisioner
         cfg.vm.provision 'ansible' do |ansible|
+          ansible.inventory_file = "ansible_hosts"
           ansible.playbook = "ansible/#{role}.yml"
         end
-
       end
+    end
+  end
 
-    }
-  }
 end
