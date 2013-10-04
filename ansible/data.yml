@@ -1,5 +1,11 @@
 ---
 - hosts: data
+  sudo: yes
   roles:
      - common
      - data
+  vars:
+       root_password: '*mysql-root@0'
+       app_schema: 'limber'
+       app_user: 'limber'
+       app_password: '*mysql-limber@0'

@@ -1,0 +1,23 @@
+- name: install latest mysql version
+  apt: pkg=mysql-server state=latest
+
+- name: install latest python-mysqldb version
+  apt: pkg=python-mysqldb state=latest
+
+- name: create {{app_schema}} database
+  mysql_db: name={{app_schema}} state=present
+
+- name: create {{app_user}} user
+  mysql_user: name={{app_user}} password=app_password priv={{app_schema}}.*:ALL state=present
+
+- name: delete anonymous MySQL server user for limberdata
+  action: mysql_user user="" host="limberdata" state="absent"
+
+- name: delete anonymous MySQL server user for localhost
+  action: mysql_user user="" state="absent"
+
+- name: remove the MySQL test database
+  action: mysql_db db=test state=absent
+
+  notify:
+  - restart mysql
