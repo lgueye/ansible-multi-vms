@@ -18,12 +18,12 @@ Vagrant.configure('2') do |config|
   app_servers_count = 2
   hosts = {}
   roles.each do |role|
-    if role != 'appserver'
-      hosts[role] = {'hosts' => [{'name' => "#{app_name}#{role}"}]}
-    else
+    hostname = "#{app_name}-#{role}"
+    hosts[role] = {'hosts' => [{'name' => hostname}]}
+    if role == 'appserver'
       hosts[role] = {'hosts' => []}
       app_servers_count.times.map do |i|
-        hosts[role]['hosts'].push ({'name' => "#{app_name}#{role}#{i}"})
+        hosts[role]['hosts'].push ({'name' => "#{hostname}-#{i}"})
       end
     end
   end
@@ -35,7 +35,7 @@ Vagrant.configure('2') do |config|
         cfg.vm.hostname = hostname
         # shell provisioner
         cfg.vm.provision "shell", inline: 'apt-get update ; apt-get upgrade -y; apt-get autoclean'
-        cfg.vm.provision "shell", inline: 'apt-get install -y python python-apt'
+        cfg.vm.provision "shell", inline: 'apt-get install -y python python-apt python-pycurl'
         # ansible provisioner
         cfg.vm.provision 'ansible' do |ansible|
           ansible.inventory_file = "ansible_hosts"

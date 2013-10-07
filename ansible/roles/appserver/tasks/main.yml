@@ -1,0 +1,30 @@
+- name: add WebUpd8 repository
+  apt_repository: repo='ppa:webupd8team/java'
+
+- name: accept the license for Oracle JDK
+  action: raw sudo echo oracle-java7-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections
+
+- name: install Oracle JDK 7 package
+  action: apt pkg='$item' state=installed
+  with_items:
+  - oracle-java7-installer
+  - oracle-java7-set-default
+
+#- name: install raw Jetty 8
+#  action: apt pkg='$item' state=installed
+#  with_items:
+#  - jetty8
+#  - libjetty8-extra-java
+#
+
+#- name: configure jetty8 (/etc/default/jetty8)
+#  shell: configure-jetty.sh
+#  notifies: restart jetty
+
+#- name: install and configure datasource (tomcat-jdbc, libmysqljava, tomcat-juli, /etc/jetty8/start.config, /etc/jetty8/jetty.xml)
+#  action: apt pkg=libjetty8-extra-java state=installed
+#  action: apt pkg=libmysql-java state=installed
+#  shell: configure-datasource.sh
+#  template: src=jetty.xml.j2 dest=/etc/jetty8/jetty.xml
+#  notifies: restart jetty
+#

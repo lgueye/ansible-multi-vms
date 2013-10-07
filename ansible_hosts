@@ -1,12 +1,12 @@
 [data]
-limberdata
+limber-data
 
 [appserver]
-limberappserver0
-limberappserver1
+limber-appserver-0
+limber-appserver-1
 
 [search]
-limbersearch
+limber-search
 
 [proxy]
-limberproxy
+limber-proxy
